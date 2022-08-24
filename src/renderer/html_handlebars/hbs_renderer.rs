@@ -701,6 +701,10 @@ fn make_data(
             "search_js".to_owned(),
             json!(search.enable && search.copy_js),
         );
+        // TODO: lang code validate
+        if search.language_code.is_some() {
+            data.insert("ru_search".to_owned(), json!(true));
+        }
     } else if search.is_some() {
         warn!("mdBook compiled without search support, ignoring `output.html.search` table");
         warn!(

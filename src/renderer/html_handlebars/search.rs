@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
+use elasticlunr::lang;
 use elasticlunr::{Index, IndexBuilder};
 use pulldown_cmark::*;
 
@@ -26,7 +27,16 @@ fn tokenize(text: &str) -> Vec<String> {
 
 /// Creates all files required for search.
 pub fn create_files(search_config: &Search, destination: &Path, book: &Book) -> Result<()> {
-    let mut index = IndexBuilder::new()
+    let default_lang_code = String::from("en");
+    let search_lang_code = search_config
+        .language_code
+        .as_ref()
+        .unwrap_or(&default_lang_code);
+    let search_lang = lang::from_code(&search_lang_code).unwrap_or_else(|| {
+        warn!("`{search_lang_code}` is not correct. Using default.");
+        Box::new(lang::English::new())
+    });
+    let mut index = IndexBuilder::with_language(search_lang)
         .add_field_with_tokenizer("title", Box::new(&tokenize))
         .add_field_with_tokenizer("body", Box::new(&tokenize))
         .add_field_with_tokenizer("breadcrumbs", Box::new(&tokenize))
@@ -54,6 +64,12 @@ pub fn create_files(search_config: &Search, destination: &Path, book: &Book) -> 
         utils::fs::write_file(destination, "searcher.js", searcher::JS)?;
         utils::fs::write_file(destination, "mark.min.js", searcher::MARK_JS)?;
         utils::fs::write_file(destination, "elasticlunr.min.js", searcher::ELASTICLUNR_JS)?;
+        utils::fs::write_file(
+            destination,
+            "lunr.stemmer.support.min.js",
+            searcher::ELASTICLUNR_STEMMER,
+        )?;
+        utils::fs::write_file(destination, "lunr.ru.min.js", searcher::ELASTICLUNR_RU_JS)?;
         debug!("Copying search files ✓");
     }
 

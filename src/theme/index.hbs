@@ -283,6 +283,11 @@
         <script src="{{ path_to_root }}searcher.js" type="text/javascript" charset="utf-8"></script>
         {{/if}}
 
+        {{#if ru_search}}
+        <script src="{{ path_to_root }}lunr.stemmer.support.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="{{ path_to_root }}lunr.ru.min.js" type="text/javascript" charset="utf-8"></script>
+        {{/if}}
+
         <script src="{{ path_to_root }}clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{ path_to_root }}highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="{{ path_to_root }}book.js" type="text/javascript" charset="utf-8"></script>

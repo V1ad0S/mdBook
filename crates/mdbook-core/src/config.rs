@@ -637,6 +637,8 @@ pub struct Code {
 pub struct Search {
     /// Enable the search feature. Default: `true`.
     pub enable: bool,
+    /// Seach language
+    pub language_code: Option<String>,
     /// Maximum number of visible results. Default: `30`.
     pub limit_results: u32,
     /// The number of words used for a search result teaser. Default: `30`.
@@ -674,6 +676,7 @@ impl Default for Search {
         // Please update the documentation of `Search` when changing values!
         Search {
             enable: true,
+            language_code: None,
             limit_results: 30,
             teaser_word_count: 30,
             use_boolean_and: false,

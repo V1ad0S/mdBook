@@ -4,7 +4,7 @@ use crate::theme::searcher;
 use crate::utils::ToUrlPath;
 use anyhow::{Result, bail};
 use ego_tree::iter::Edge;
-use elasticlunr::{Index, IndexBuilder};
+use elasticlunr::{Index, IndexBuilder, lang};
 use mdbook_core::book::Chapter;
 use mdbook_core::config::{Search, SearchChapterSettings};
 use mdbook_core::static_regex;
@@ -31,7 +31,12 @@ pub(super) fn create_files(
     static_files: &mut StaticFiles,
     chapter_trees: &[ChapterTree<'_>],
 ) -> Result<()> {
-    let mut index = IndexBuilder::new()
+    let search_lang = search_config
+        .language_code
+        .as_ref()
+        .and_then(|code| lang::from_code(code))
+        .unwrap_or(Box::new(lang::English::new()));
+    let mut index = IndexBuilder::with_language(search_lang)
         .add_field_with_tokenizer("title", Box::new(&tokenize))
         .add_field_with_tokenizer("body", Box::new(&tokenize))
         .add_field_with_tokenizer("breadcrumbs", Box::new(&tokenize))
@@ -72,6 +77,8 @@ pub(super) fn create_files(
         static_files.add_builtin("searcher.js", searcher::JS);
         static_files.add_builtin("mark.min.js", searcher::MARK_JS);
         static_files.add_builtin("elasticlunr.min.js", searcher::ELASTICLUNR_JS);
+        static_files.add_builtin("lunr.stemmer.support.min.js", searcher::ELASTICLUNR_STEMMER);
+        static_files.add_builtin("lunr.ru.min.js", searcher::ELASTICLUNR_RU_JS);
         debug!("Copying search files ✓");
     }
 
